@@ -55,3 +55,18 @@ Visual language inspired by premium automotive showrooms (dark / light stages, u
 - Search works by model name, generation, and year — without page reload.
 - Placeholders stand in until real photos arrive.
 - Non-commercial personal collection.
+
+## GitHub Pages
+
+Repository: [github.com/Kibou37/opel](https://github.com/Kibou37/opel)
+
+Live site (after Pages is enabled): **https://kibou37.github.io/opel/**
+
+### One-time setup in GitHub
+
+1. Open **Settings → Pages** in the repository.
+2. Under **Build and deployment → Source**, choose **GitHub Actions**.
+3. Wait for the workflow **Deploy GitHub Pages** to finish (Actions tab).
+4. Open the site URL above.
+
+Each push to `main` redeploys the site automatically.
