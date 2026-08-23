@@ -1,0 +1,64 @@
+:root {
+  /* Colors — showroom black + single yellow spotlight */
+  --color-giallo-vivo: #ffc000;
+  --color-giallo-ombra: #917300;
+  --color-carbony-black: #202020;
+  --color-pure-black: #000000;
+  --color-carbon-deep: #181818;
+  --color-pearl-white: #ffffff;
+  --color-marble-gray: #f5f5f5;
+  --color-graphite-border: #494949;
+  --color-steel-mid: #7d7d7d;
+  --color-ash-border: #969696;
+  --color-anvil: #313131;
+
+  /* Typography — Barlow Condensed as LamboType substitute */
+  --font-display: "Barlow Condensed", "Rajdhani", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-tracking: 0.023em;
+  --font-weight: 500;
+  --font-weight-strong: 600;
+
+  --text-caption: 12px;
+  --leading-caption: 1.5;
+  --text-label: 14px;
+  --leading-label: 1.5;
+  --text-body: 17px;
+  --leading-body: 1.5;
+  --text-subheading: 20px;
+  --leading-subheading: 1.5;
+  --text-heading-sm: 27px;
+  --leading-heading-sm: 1.37;
+  --text-heading: 32px;
+  --leading-heading: 1.38;
+  --text-heading-lg: 40px;
+  --leading-heading-lg: 1.19;
+  --text-display: 54px;
+  --leading-display: 1.13;
+  --text-display-lg: 80px;
+  --leading-display-lg: 1;
+  --text-hero: clamp(64px, 10vw, 120px);
+  --leading-hero: 0.92;
+
+  /* Spacing — 8px base */
+  --space-8: 8px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-56: 56px;
+  --space-64: 64px;
+  --space-80: 80px;
+  --space-160: 160px;
+
+  --page-max: 1440px;
+  --section-gap: 80px;
+  --nav-height: 64px;
+  --radius: 0px;
+
+  --surface-canvas: #ffffff;
+  --surface-marble: #f5f5f5;
+  --surface-carbony: #202020;
+  --surface-deep: #181818;
+  --surface-black: #000000;
+}

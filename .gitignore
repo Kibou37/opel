@@ -1,0 +1,10 @@
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Local agent tooling (not part of the site)
+.agents/
+.tools/
+skills-lock.json

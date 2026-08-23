@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OPEL — Digital Museum</title>
+    <meta
+      name="description"
+      content="A private digital museum of Opel automobiles produced before 2007."
+    />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="media/brand/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="media/brand/apple-touch-icon.png" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+  </head>
+  <body data-base="" data-page="home">
+    <div id="site-header"></div>
+
+    <main>
+      <section class="hero" id="home-hero">
+        <div class="hero__slides" aria-hidden="true">
+          <div class="hero__slide is-active" style="background-image:url('media/home/hero-01.jpg')"></div>
+          <div class="hero__slide" style="background-image:url('media/home/hero-02.jpg')"></div>
+          <div class="hero__slide" style="background-image:url('media/home/hero-03.jpg')"></div>
+          <div class="hero__slide" style="background-image:url('media/home/hero-04.jpg')"></div>
+        </div>
+        <div class="hero__veil" aria-hidden="true"></div>
+        <div class="hero__content">
+          <p class="hero__eyebrow">Digital collection · Until 2007</p>
+          <h1 class="t-hero hero__title">Opel<br />Museum</h1>
+          <div class="hero__actions">
+            <a class="btn-giallo" href="pages/collection.html">Explore collection →</a>
+            <a class="btn-ghost btn-ghost--light" href="pages/history.html">History of Opel →</a>
+          </div>
+        </div>
+        <div class="hero__pips" id="hero-pips" aria-hidden="true">
+          <button type="button" class="pip is-active" data-slide="0" aria-label="Slide 1"></button>
+          <button type="button" class="pip" data-slide="1" aria-label="Slide 2"></button>
+          <button type="button" class="pip" data-slide="2" aria-label="Slide 3"></button>
+          <button type="button" class="pip" data-slide="3" aria-label="Slide 4"></button>
+        </div>
+      </section>
+
+      <section class="section surface-white cult-section">
+        <div class="container section-block">
+          <div class="section-head reveal">
+            <h2 class="section-head__title">Cult models</h2>
+          </div>
+          <div class="cult-marquee home-preview-grid reveal" id="home-cult" aria-label="Cult models"></div>
+          <a class="section-head__link section-more-btn" href="pages/collection.html">Full collection →</a>
+        </div>
+      </section>
+
+      <section class="section surface-dark">
+        <div class="container section-block">
+          <div class="section-head reveal">
+            <h2 class="section-head__title">Timeline</h2>
+          </div>
+          <div class="home-timeline-wrap reveal">
+            <div class="home-timeline" id="home-timeline"></div>
+            <a class="section-more-btn home-timeline__more btn-ghost btn-ghost--light" href="pages/timeline.html"
+              >Full timeline →</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="section surface-white">
+        <div class="container section-block">
+          <div class="section-head reveal">
+            <h2 class="section-head__title">History of Opel</h2>
+          </div>
+          <p class="prose reveal">
+            From Rüsselsheim workshops to European popular motoring — a narrative of
+            industry, design, and everyday legends.
+          </p>
+          <a class="section-head__link section-more-btn" href="pages/history.html">Read history →</a>
+        </div>
+      </section>
+
+      <section class="section surface-dark">
+        <div class="container section-block">
+          <div class="section-head reveal">
+            <h2 class="section-head__title">Latest in the collection</h2>
+          </div>
+          <div class="tile-grid home-preview-grid" id="home-latest"></div>
+          <a class="section-head__link section-more-btn btn-ghost--light" href="pages/collection.html"
+            >View all →</a
+          >
+        </div>
+      </section>
+
+      <section class="section surface-white">
+        <div class="container section-block">
+          <div class="section-head reveal">
+            <h2 class="section-head__title">World of Opel</h2>
+          </div>
+          <div class="tile-grid home-preview-grid" id="home-articles"></div>
+          <a class="section-head__link section-more-btn" href="pages/world/index.html">Discover world →</a>
+        </div>
+      </section>
+
+      <section class="section surface-dark">
+        <div class="container section-block">
+          <div class="section-head reveal">
+            <h2 class="section-head__title">Gallery</h2>
+          </div>
+          <p class="t-sub reveal" style="color: var(--color-ash-border); max-width: 40ch; text-transform: none; letter-spacing: 0.01em;">
+            Browse collection heroes, banners, and World of Opel photography in one place.
+          </p>
+          <a class="section-head__link section-more-btn btn-ghost--light" href="pages/gallery.html"
+            >Open gallery →</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/pages.js"></script>
+  </body>
+</html>
