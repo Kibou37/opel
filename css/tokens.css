@@ -12,13 +12,13 @@
   --color-ash-border: #969696;
   --color-anvil: #313131;
 
-  /* Typography — Barlow Condensed as LamboType substitute */
+  /* Typography */
   --font-display: "Barlow Condensed", "Rajdhani", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
   --font-tracking: 0.023em;
   --font-weight: 500;
   --font-weight-strong: 600;
 
-  --text-caption: 12px;
+  --text-caption: 16px;
   --leading-caption: 1.5;
   --text-label: 14px;
   --leading-label: 1.5;

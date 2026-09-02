@@ -4,7 +4,10 @@ Thumbs.db
 *.log
 *.tmp
 
-# Local agent tooling (not part of the site)
+# Local tooling (not shipped with the site)
 .agents/
 .tools/
 skills-lock.json
+
+# Download artefacts
+**/dl.tmp

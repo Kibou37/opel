@@ -26,6 +26,43 @@
     return window.OPEL_UI.mediaPlaceholder(article.title);
   }
 
+  function normalizeSpecs(specs) {
+    if (!specs) return [];
+    if (Array.isArray(specs)) {
+      return specs.filter(function (item) {
+        return item && item.label && item.value;
+      });
+    }
+    if (typeof specs === "object") {
+      return Object.keys(specs).map(function (key) {
+        return { label: key, value: specs[key] };
+      });
+    }
+    return [];
+  }
+
+  function renderSpecsHtml(specs) {
+    var items = normalizeSpecs(specs);
+    if (!items.length) return "";
+    return (
+      '<div class="article-stats reveal">' +
+      items
+        .map(function (item) {
+          return (
+            '<div class="article-stat">' +
+            '<div class="article-stat__label">' +
+            item.label +
+            "</div>" +
+            '<div class="article-stat__value">' +
+            item.value +
+            "</div></div>"
+          );
+        })
+        .join("") +
+      "</div>"
+    );
+  }
+
   function pageHeroHtml(opts) {
     var image = opts.image || null;
     var cls = "page-hero" + (image ? " page-hero--banner" : "");
@@ -113,6 +150,10 @@
       timelineMount.innerHTML = window.OPEL.timeline
         .slice(0, 3)
         .map(function (item) {
+          var preview =
+            item.text ||
+            (item.paragraphs && item.paragraphs[0]) ||
+            "";
           return (
             '<article class="home-timeline__item reveal">' +
             '<div class="home-timeline__year">' +
@@ -123,7 +164,7 @@
             item.title +
             "</h3>" +
             '<p class="home-timeline__text">' +
-            item.text +
+            preview +
             "</p>" +
             "</div>" +
             "</article>"
@@ -195,11 +236,14 @@
     var offset = 0;
     var speed = 0.45;
     var paused = false;
-    var dragging = false;
+    var pointerActive = false;
+    var dragActive = false;
+    var suppressClick = false;
     var lastX = 0;
     var moved = 0;
     var half = 0;
     var rafId = 0;
+    var dragThreshold = 8;
 
     function isCompact() {
       return compactQuery.matches;
@@ -245,7 +289,7 @@
     }
 
     function tick() {
-      if (!isCompact() && !reduceQuery.matches && !paused && !dragging) {
+      if (!isCompact() && !reduceQuery.matches && !paused && !dragActive) {
         offset -= speed;
         wrapOffset();
         apply();
@@ -256,7 +300,9 @@
     function enterCompactMode() {
       root.classList.add("is-compact");
       root.classList.remove("is-dragging");
-      dragging = false;
+      pointerActive = false;
+      dragActive = false;
+      suppressClick = false;
       paused = false;
       removeClones();
       stopAnimation();
@@ -290,32 +336,43 @@
     });
 
     root.addEventListener("mouseleave", function () {
-      if (!dragging) paused = false;
+      if (!pointerActive) paused = false;
     });
 
     root.addEventListener("mousedown", function (e) {
       if (isCompact() || e.button !== 0) return;
-      dragging = true;
-      paused = true;
+      pointerActive = true;
+      dragActive = false;
+      suppressClick = false;
       moved = 0;
       lastX = e.clientX;
-      root.classList.add("is-dragging");
-      e.preventDefault();
+      paused = true;
     });
 
     window.addEventListener("mousemove", function (e) {
-      if (!dragging) return;
+      if (!pointerActive) return;
       var dx = e.clientX - lastX;
       lastX = e.clientX;
       moved += Math.abs(dx);
+
+      if (!dragActive && moved > dragThreshold) {
+        dragActive = true;
+        root.classList.add("is-dragging");
+      }
+
+      if (!dragActive) return;
+
+      e.preventDefault();
       offset += dx;
       wrapOffset();
       apply();
     });
 
     window.addEventListener("mouseup", function () {
-      if (!dragging) return;
-      dragging = false;
+      if (!pointerActive) return;
+      if (dragActive) suppressClick = true;
+      pointerActive = false;
+      dragActive = false;
       root.classList.remove("is-dragging");
       if (!root.matches(":hover")) paused = false;
     });
@@ -323,9 +380,10 @@
     root.addEventListener(
       "click",
       function (e) {
-        if (moved > 6) {
+        if (suppressClick) {
           e.preventDefault();
           e.stopPropagation();
+          suppressClick = false;
         }
         moved = 0;
       },
@@ -460,37 +518,109 @@
 
     document.title = car.name + " " + car.generation + " — OPEL";
 
-    var specsRows = Object.keys(car.specs)
-      .map(function (k) {
-        return "<tr><th>" + k + "</th><td>" + car.specs[k] + "</td></tr>";
-      })
-      .join("");
+    function renderParagraphs(paragraphs, withLead) {
+      return (paragraphs || [])
+        .map(function (p, index) {
+          var cls = withLead && index === 0 ? ' class="article-block__lead"' : "";
+          return "<p" + cls + ">" + p + "</p>";
+        })
+        .join("");
+    }
 
-    var engines = car.engines
+    var specsHtml = renderSpecsHtml(car.specs);
+
+    var storyHtml = "";
+    if (car.sections && car.sections.length) {
+      storyHtml = car.sections
+        .map(function (section, index) {
+          return (
+            '<section class="article-block reveal article-block--no-figure">' +
+            '<div class="article-block__index" aria-hidden="true">' +
+            String(index + 1).padStart(2, "0") +
+            "</div>" +
+            '<div class="article-block__main">' +
+            '<h2 class="article-block__title">' +
+            section.heading +
+            "</h2>" +
+            '<div class="article-block__body">' +
+            renderParagraphs(section.body, true) +
+            "</div></div></section>"
+          );
+        })
+        .join("");
+    } else {
+      storyHtml =
+        '<div class="article-block article-block--simple reveal">' +
+        '<div class="article-block__body article-block__body--wide">' +
+        renderParagraphs([car.history], true) +
+        "</div></div>";
+    }
+
+    var enginesHtml = car.engines
       .map(function (eng) {
         return (
-          '<div class="engine-card" data-sound="' +
+          '<article class="engine-card engine-card--rich" data-sound="' +
           window.OPEL_UI.path(eng.sound) +
           '" tabindex="0" role="button" aria-label="Play engine sound for ' +
           eng.name +
           '">' +
           '<div class="engine-card__pulse" aria-hidden="true"></div>' +
+          '<div class="engine-card__head">' +
           '<div class="engine-card__name">' +
           eng.name +
           "</div>" +
           '<div class="engine-card__meta">' +
           eng.meta +
-          "</div>" +
+          "</div></div>" +
+          (eng.description
+            ? '<div class="engine-card__text">' + eng.description + "</div>"
+            : "") +
           '<div class="engine-card__hint">Click to hear the engine · Hover for animation</div>' +
-          "</div>"
+          "</article>"
         );
       })
       .join("");
 
+    var trimDetails =
+      car.trimDetails && car.trimDetails.length
+        ? car.trimDetails
+        : (car.trims || []).map(function (name) {
+            return { name: name, description: "" };
+          });
+
+    var trimsHtml = trimDetails
+      .map(function (trim) {
+        return (
+          '<article class="trim-card reveal">' +
+          '<h3 class="trim-card__name">' +
+          trim.name +
+          "</h3>" +
+          (trim.description
+            ? '<p class="trim-card__text">' + trim.description + "</p>"
+            : "") +
+          "</article>"
+        );
+      })
+      .join("");
+
+    var transmissionHtml =
+      '<p class="car-transmission__list">' +
+      car.transmissions.join(" · ") +
+      "</p>" +
+      (car.transmissionNotes
+        ? '<div class="car-transmission__notes">' +
+          renderParagraphs(
+            Array.isArray(car.transmissionNotes)
+              ? car.transmissionNotes
+              : [car.transmissionNotes]
+          ) +
+          "</div>"
+        : "");
+
     var facts = car.facts
       .map(function (f, i) {
         return (
-          '<div class="fact-item"><div class="fact-item__num">' +
+          '<div class="fact-item reveal"><div class="fact-item__num">' +
           String(i + 1).padStart(2, "0") +
           '</div><div class="fact-item__text">' +
           f +
@@ -529,50 +659,50 @@
         lead: car.description,
         image: car.image,
       }) +
-      '<section class="section surface-white">' +
+      '<section class="section surface-white car-page">' +
       '<div class="container">' +
-      '<div class="section-head"><h2 class="section-head__title">The story</h2></div>' +
-      '<div class="prose"><p>' +
-      car.history +
-      "</p></div>" +
+      '<article class="article-editorial">' +
+      specsHtml +
+      '<div class="article-editorial__sections">' +
+      storyHtml +
       "</div>" +
-      "</section>" +
-      '<section class="section surface-marble">' +
-      '<div class="container">' +
-      '<div class="section-head"><h2 class="section-head__title">Specifications</h2></div>' +
-      '<table class="specs">' +
-      specsRows +
-      "</table>" +
+      '<section class="car-detail-block reveal">' +
+      '<div class="car-detail-block__head">' +
+      '<span class="article-spread__eyebrow">Powertrain</span>' +
+      '<h2 class="car-detail-block__title">Engines</h2>' +
       "</div>" +
-      "</section>" +
-      '<section class="section surface-white">' +
-      '<div class="container">' +
-      '<div class="section-head"><h2 class="section-head__title">Engines</h2></div>' +
-      '<div class="engine-list" id="engine-list">' +
-      engines +
+      '<div class="engine-list engine-list--rich">' +
+      enginesHtml +
+      "</div></section>" +
+      '<section class="car-detail-block reveal">' +
+      '<div class="car-detail-block__head">' +
+      '<span class="article-spread__eyebrow">Equipment</span>' +
+      '<h2 class="car-detail-block__title">Trims &amp; equipment</h2>' +
       "</div>" +
+      '<div class="trim-grid">' +
+      trimsHtml +
+      "</div></section>" +
+      '<section class="car-detail-block reveal">' +
+      '<div class="car-detail-block__head">' +
+      '<span class="article-spread__eyebrow">Drivetrain</span>' +
+      '<h2 class="car-detail-block__title">Transmissions</h2>' +
       "</div>" +
-      "</section>" +
-      '<section class="section surface-marble">' +
-      '<div class="container">' +
-      '<div class="section-head"><h2 class="section-head__title">Transmissions</h2></div>' +
-      "<p class=\"t-body\">" +
-      car.transmissions.join(" · ") +
-      "</p>" +
-      '<div class="section-head" style="margin-top:64px"><h2 class="section-head__title">Trims</h2></div>' +
-      "<p class=\"t-body\">" +
-      car.trims.join(" · ") +
-      "</p>" +
+      '<div class="car-transmission">' +
+      transmissionHtml +
+      "</div></section>" +
+      '<section class="car-detail-block reveal">' +
+      '<div class="car-detail-block__head">' +
+      '<span class="article-spread__eyebrow">Notes</span>' +
+      '<h2 class="car-detail-block__title">Interesting facts</h2>' +
       "</div>" +
-      "</section>" +
-      '<section class="section surface-white">' +
-      '<div class="container">' +
-      '<div class="section-head"><h2 class="section-head__title">Interesting facts</h2></div>' +
       '<div class="fact-list">' +
       facts +
-      "</div>" +
-      "</div>" +
-      "</section>" +
+      "</div></section>" +
+      '<footer class="article-editorial__footer">' +
+      '<a class="btn-ghost" href="' +
+      window.OPEL_UI.path("pages/collection.html") +
+      '">← Back to collection</a>' +
+      "</footer></article></div></section>" +
       '<section class="section surface-dark">' +
       '<div class="container">' +
       '<div class="section-head"><h2 class="section-head__title">Related</h2>' +
@@ -581,9 +711,7 @@
       '">Full collection →</a></div>' +
       '<div class="related-grid">' +
       related +
-      "</div>" +
-      "</div>" +
-      "</section>";
+      "</div></div></section>";
 
     initEngineSounds();
   }
@@ -625,24 +753,85 @@
     var root = document.getElementById("history-page");
     if (!root || !window.OPEL) return;
     var h = window.OPEL.history;
-    root.innerHTML = h.sections
-      .map(function (s) {
-        return (
-          '<section class="section">' +
-          '<div class="container">' +
-          "<h2 class=\"t-display reveal\">" +
-          s.heading +
-          "</h2>" +
-          '<div class="prose reveal" style="margin-top:24px">' +
-          s.paragraphs
-            .map(function (p) {
-              return "<p>" + p + "</p>";
-            })
-            .join("") +
-          "</div></div></section>"
-        );
-      })
-      .join("");
+
+    function renderParagraphs(paragraphs, withLead) {
+      return (paragraphs || [])
+        .map(function (p, index) {
+          var cls = withLead && index === 0 ? ' class="article-block__lead"' : "";
+          return "<p" + cls + ">" + p + "</p>";
+        })
+        .join("");
+    }
+
+    function renderFigure(image, caption, alt) {
+      if (!image) return "";
+      return (
+        '<figure class="article-block__figure reveal">' +
+        '<div class="article-block__figure-media">' +
+        '<img src="' +
+        window.OPEL_UI.path(image) +
+        '" alt="' +
+        (alt || caption || "History of Opel") +
+        '" loading="lazy" />' +
+        "</div>" +
+        (caption
+          ? '<figcaption class="article-block__caption">' + caption + "</figcaption>"
+          : "") +
+        "</figure>"
+      );
+    }
+
+    var heroHtml = h.heroImage
+      ? '<figure class="history-hero reveal">' +
+        '<div class="history-hero__media">' +
+        '<img src="' +
+        window.OPEL_UI.path(h.heroImage) +
+        '" alt="' +
+        (h.heroCaption || h.title) +
+        '" loading="eager" />' +
+        "</div>" +
+        (h.heroCaption
+          ? '<figcaption class="history-hero__caption">' + h.heroCaption + "</figcaption>"
+          : "") +
+        "</figure>"
+      : "";
+
+    root.innerHTML =
+      '<section class="section surface-white history-page">' +
+      '<div class="container">' +
+      '<article class="article-editorial">' +
+      heroHtml +
+      (h.lead
+        ? '<p class="history-lead reveal">' + h.lead + "</p>"
+        : "") +
+      '<div class="article-editorial__sections">' +
+      h.sections
+        .map(function (section, index) {
+          var figureHtml = renderFigure(
+            section.image,
+            section.caption,
+            section.heading
+          );
+          return (
+            '<section class="article-block reveal' +
+            (figureHtml ? "" : " article-block--no-figure") +
+            '">' +
+            '<div class="article-block__index" aria-hidden="true">' +
+            String(index + 1).padStart(2, "0") +
+            "</div>" +
+            '<div class="article-block__main">' +
+            '<h2 class="article-block__title">' +
+            section.heading +
+            "</h2>" +
+            '<div class="article-block__body">' +
+            renderParagraphs(section.paragraphs, true) +
+            "</div></div>" +
+            figureHtml +
+            "</section>"
+          );
+        })
+        .join("") +
+      "</div></article></div></section>";
   }
 
   function renderTimeline() {
@@ -650,21 +839,141 @@
     if (!root || !window.OPEL) return;
     root.innerHTML = window.OPEL.timeline
       .map(function (item) {
+        var body = item.paragraphs
+          ? item.paragraphs
+              .map(function (p, i) {
+                var cls = i === 0 ? ' class="timeline__lead"' : "";
+                return "<p" + cls + ">" + p + "</p>";
+              })
+              .join("")
+          : '<p class="timeline__lead">' + item.text + "</p>";
+        var figureHtml = item.image
+          ? '<figure class="timeline__figure reveal">' +
+            '<div class="timeline__figure-media">' +
+            '<img src="' +
+            window.OPEL_UI.path(item.image) +
+            '" alt="' +
+            (item.caption || item.title) +
+            '" loading="lazy" />' +
+            "</div>" +
+            (item.caption
+              ? '<figcaption class="timeline__caption">' + item.caption + "</figcaption>"
+              : "") +
+            "</figure>"
+          : "";
         return (
-          '<article class="timeline__item reveal">' +
+          '<article class="timeline__item reveal' +
+          (item.image ? " timeline__item--with-image" : "") +
+          '">' +
           '<div class="timeline__year">' +
           item.year +
           "</div>" +
+          '<div class="timeline__content">' +
+          '<div class="timeline__body">' +
           '<h2 class="timeline__title">' +
           item.title +
           "</h2>" +
-          '<p class="timeline__text">' +
-          item.text +
-          "</p>" +
-          "</article>"
+          '<div class="timeline__text">' +
+          body +
+          "</div></div>" +
+          figureHtml +
+          "</div></article>"
         );
       })
       .join("");
+  }
+
+  function renderAbout() {
+    var root = document.getElementById("about-prose");
+    if (!root || !window.OPEL) return;
+    var about = window.OPEL.about;
+
+    function renderParagraphs(paragraphs, withLead) {
+      return (paragraphs || [])
+        .map(function (p, index) {
+          var cls = withLead && index === 0 ? ' class="article-block__lead"' : "";
+          return "<p" + cls + ">" + p + "</p>";
+        })
+        .join("");
+    }
+
+    function renderFigure(image, caption, alt) {
+      if (!image) return "";
+      return (
+        '<figure class="article-block__figure reveal">' +
+        '<div class="article-block__figure-media">' +
+        '<img src="' +
+        window.OPEL_UI.path(image) +
+        '" alt="' +
+        (alt || caption || "About the museum") +
+        '" loading="lazy" />' +
+        "</div>" +
+        (caption
+          ? '<figcaption class="article-block__caption">' + caption + "</figcaption>"
+          : "") +
+        "</figure>"
+      );
+    }
+
+    if (about.sections && about.sections.length) {
+      var heroHtml = about.heroImage
+        ? '<figure class="history-hero reveal">' +
+          '<div class="history-hero__media">' +
+          '<img src="' +
+          window.OPEL_UI.path(about.heroImage) +
+          '" alt="' +
+          (about.heroCaption || about.title || "About") +
+          '" loading="eager" />' +
+          "</div>" +
+          (about.heroCaption
+            ? '<figcaption class="history-hero__caption">' +
+              about.heroCaption +
+              "</figcaption>"
+            : "") +
+          "</figure>"
+        : "";
+
+      root.innerHTML =
+        '<article class="article-editorial">' +
+        heroHtml +
+        (about.lead
+          ? '<p class="history-lead reveal">' + about.lead + "</p>"
+          : "") +
+        '<div class="article-editorial__sections">' +
+        about.sections
+          .map(function (section, index) {
+            var figureHtml = renderFigure(
+              section.image,
+              section.caption,
+              section.heading
+            );
+            return (
+              '<section class="article-block reveal' +
+              (figureHtml ? "" : " article-block--no-figure") +
+              '">' +
+              '<div class="article-block__index" aria-hidden="true">' +
+              String(index + 1).padStart(2, "0") +
+              "</div>" +
+              '<div class="article-block__main">' +
+              '<h2 class="article-block__title">' +
+              section.heading +
+              "</h2>" +
+              '<div class="article-block__body">' +
+              renderParagraphs(section.paragraphs, true) +
+              "</div></div>" +
+              figureHtml +
+              "</section>"
+            );
+          })
+          .join("") +
+        "</article>";
+    } else {
+      root.innerHTML = about.paragraphs
+        .map(function (p) {
+          return "<p>" + p + "</p>";
+        })
+        .join("");
+    }
   }
 
   function renderWorldIndex() {
@@ -800,11 +1109,114 @@
     var cat = window.OPEL.worldCategories.find(function (c) {
       return c.id === article.category;
     });
-    var bodyHtml = (Array.isArray(article.body) ? article.body : [article.body])
-      .map(function (p) {
-        return "<p>" + p + "</p>";
-      })
-      .join("");
+
+    function renderParagraphs(paragraphs, withLead) {
+      return (paragraphs || [])
+        .map(function (p, index) {
+          var cls = withLead && index === 0 ? ' class="article-block__lead"' : "";
+          return "<p" + cls + ">" + p + "</p>";
+        })
+        .join("");
+    }
+
+    var specsHtml = renderSpecsHtml(article.specs);
+
+    var sectionsHtml = "";
+    if (article.sections && article.sections.length) {
+      sectionsHtml = article.sections
+        .map(function (section, index) {
+          var figureHtml = "";
+          if (article.gallery && article.gallery[index]) {
+            var item = article.gallery[index];
+            figureHtml =
+              '<figure class="article-block__figure reveal">' +
+              '<div class="article-block__figure-media">' +
+              '<img src="' +
+              window.OPEL_UI.path(item.image) +
+              '" alt="' +
+              (item.caption || article.title) +
+              '" loading="lazy" />' +
+              "</div>" +
+              (item.caption
+                ? '<figcaption class="article-block__caption">' +
+                  item.caption +
+                  "</figcaption>"
+                : "") +
+              "</figure>";
+          }
+
+          var blockClass =
+            "article-block reveal" +
+            (figureHtml ? "" : " article-block--no-figure");
+
+          return (
+            '<section class="' +
+            blockClass +
+            '">' +
+            '<div class="article-block__index" aria-hidden="true">' +
+            String(index + 1).padStart(2, "0") +
+            "</div>" +
+            '<div class="article-block__main">' +
+            '<h2 class="article-block__title">' +
+            section.heading +
+            "</h2>" +
+            '<div class="article-block__body">' +
+            renderParagraphs(section.body, true) +
+            "</div>" +
+            "</div>" +
+            figureHtml +
+            "</section>"
+          );
+        })
+        .join("");
+    } else {
+      sectionsHtml =
+        '<div class="article-block article-block--simple reveal">' +
+        '<div class="article-block__body article-block__body--wide">' +
+        renderParagraphs(
+          Array.isArray(article.body) ? article.body : [article.body],
+          true
+        ) +
+        "</div></div>";
+    }
+
+    var galleryRemainder =
+      article.gallery && article.sections
+        ? article.gallery.slice(article.sections.length)
+        : article.gallery || [];
+
+    var galleryHtml = "";
+    if (galleryRemainder.length) {
+      galleryHtml =
+        '<section class="article-spread reveal">' +
+        '<div class="article-spread__head">' +
+        '<span class="article-spread__eyebrow">Press gallery</span>' +
+        '<h2 class="article-spread__title">Photography</h2>' +
+        "</div>" +
+        '<div class="article-gallery article-gallery--spread">' +
+        galleryRemainder
+          .map(function (item) {
+            return (
+              '<figure class="article-gallery__item">' +
+              '<div class="article-gallery__media">' +
+              '<img src="' +
+              window.OPEL_UI.path(item.image) +
+              '" alt="' +
+              (item.caption || article.title) +
+              '" loading="lazy" />' +
+              "</div>" +
+              (item.caption
+                ? '<figcaption class="article-gallery__caption">' +
+                  item.caption +
+                  "</figcaption>"
+                : "") +
+              "</figure>"
+            );
+          })
+          .join("") +
+        "</div></section>";
+    }
+
     root.innerHTML =
       pageHeroHtml({
         eyebrow:
@@ -813,18 +1225,23 @@
         lead: article.excerpt,
         image: article.image || categoryBannerImage(cat),
       }) +
-      '<section class="section surface-white"><div class="container">' +
-      '<div class="prose">' +
-      bodyHtml +
+      '<section class="section surface-white article-page">' +
+      '<div class="container">' +
+      '<article class="article-editorial">' +
+      specsHtml +
+      '<div class="article-editorial__sections">' +
+      sectionsHtml +
       "</div>" +
-      '<p style="margin-top:48px"><a class="btn-ghost" href="' +
+      galleryHtml +
+      '<footer class="article-editorial__footer">' +
+      '<a class="btn-ghost" href="' +
       window.OPEL_UI.path(
         "pages/world/category.html?id=" + encodeURIComponent(article.category)
       ) +
       '">← Back to ' +
       (cat ? cat.name : "category") +
-      "</a></p>" +
-      "</div></section>";
+      "</a></footer>" +
+      "</article></div></section>";
   }
 
   function renderGallery() {
@@ -911,16 +1328,6 @@
       if (e.key === "ArrowLeft") open((current - 1 + items.length) % items.length);
       if (e.key === "ArrowRight") open((current + 1) % items.length);
     });
-  }
-
-  function renderAbout() {
-    var root = document.getElementById("about-prose");
-    if (!root || !window.OPEL) return;
-    root.innerHTML = window.OPEL.about.paragraphs
-      .map(function (p) {
-        return "<p>" + p + "</p>";
-      })
-      .join("");
   }
 
   document.addEventListener("DOMContentLoaded", function () {

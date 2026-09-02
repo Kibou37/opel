@@ -1,7 +1,4 @@
-/**
- * OPEL Museum - content data (edit this file to add cars, articles, timeline).
- * Works with file:// - no fetch required.
- */
+// OPEL Museum data — works with file:// (no build step).
 (function () {
   "use strict";
 
@@ -23,11 +20,15 @@
           id: cfg.id + "-eng-" + i,
           name: e.name,
           meta: e.meta,
+          description: e.description || "",
           sound: e.sound || "media/sounds/placeholder.mp3",
         };
       }),
       transmissions: cfg.transmissions || ["5-speed manual", "4-speed automatic"],
+      transmissionNotes: cfg.transmissionNotes || "",
       trims: cfg.trims || [],
+      trimDetails: cfg.trimDetails || [],
+      sections: cfg.sections || [],
       facts: cfg.facts || [],
       related: cfg.related || [],
       gallery: img ? [img] : [],
@@ -573,7 +574,7 @@
     }),
   ];
 
-  // Chronological collection order
+  // Collection display order
   cars.sort(function (a, b) {
     return a.yearStart - b.yearStart || a.name.localeCompare(b.name);
   });
@@ -596,7 +597,7 @@
       {
         id: "opc",
         name: "OPC",
-        description: "Opel Performance Center - sharper, faster, focused.",
+        description: "Opel Performance Center - factory performance from Rüsselsheim.",
         image: "media/world/opc/banner.jpg",
       },
       {
@@ -672,17 +673,43 @@
         image: "media/world/concepts/junior.jpg",
       },
       {
+        id: "from-gsi-to-opc",
+        category: "opc",
+        date: "1984",
+        title: "From GSi to OPC",
+        excerpt: "Before the three letters: Opel's Grand Sport Injection decade.",
+        body: [
+          "OPC did not appear from nowhere. Through the mid-1980s and 1990s Opel already sold sporting derivatives under the GSi badge - Grand Sport Injection - cars that promised sharper engines, firmer chassis work, and body kits that made everyday models look ready for the weekend.",
+          "Manta B GSi (from 1984) gave the coupe line a fuel-injected 2.0-litre character and rear-drive agility. Kadett E GSi followed with stronger brakes, Recaro seats, and sixteen-valve power up to around 150 PS. Astra F GSi carried the idea into the 1990s hatch era, while Corsa GSi versions kept the badge alive at supermini scale.",
+          "These cars mattered because they proved Opel customers wanted emotion as well as economy. What they lacked was a single workshop with a continuous brief. That gap is exactly what Opel Performance Center was created to fill.",
+        ],
+        image: "media/world/opc/from-gsi-to-opc.jpg",
+      },
+      {
         id: "opc-origins",
         category: "opc",
-        date: "1999",
+        date: "1997",
         title: "OPC Origins",
-        excerpt: "How Opel Performance Center sharpened the brand's edge.",
+        excerpt: "How Opel Performance Center was founded in Rüsselsheim.",
         body: [
-          "OPC - Opel Performance Center - gave sporting ambition a clear badge and a clearer mission. Instead of scattered hot variants, Opel concentrated engineering focus into cars with genuine road intent: stronger brakes, sharper chassis work, and engines that felt purposeful rather than merely loud.",
-          "The Astra OPC generation that followed became the public face of the idea for many enthusiasts. Blue paint, spoilers, and serious turbo power turned a family hatch into a club for people who liked their Opels intense.",
-          "OPC mattered culturally as much as technically. It told Europe that Opel could be emotional on purpose - not only practical by default.",
+          "In 1997 Opel founded Opel Performance Center GmbH in Rüsselsheim as a dedicated subsidiary for high-performance road cars. The brief was simple and ambitious: take production platforms and give them factory-backed power, brakes, suspension, and aerodynamics that enthusiasts could trust.",
+          "Former DTM racer Volker Strycek became managing director. His motorsport background mattered - OPC was not meant to be a styling sticker programme. Development leaned on circuit discipline, especially the Nürburgring Nordschleife, which Opel treated as a living laboratory for durability and handling.",
+          "The division's first public statement arrived in 1999 with Astra G OPC. From that moment the three letters meant a coherent language: Arden Blue paint, Recaro seats, checkered-flag OPC badging, and the slogan Pure Passion. In the United Kingdom the same cars later wore Vauxhall's VXR name, but the engineering DNA stayed Opel.",
         ],
         image: "media/world/opc/origins.jpg",
+      },
+      {
+        id: "opc-identity",
+        category: "opc",
+        date: "1999",
+        title: "Arden Blue & Pure Passion",
+        excerpt: "The visual code that made OPC readable at a glance.",
+        body: [
+          "OPC cars were engineered first - but they were also designed to be recognised. Arden Blue became the signature colour: a bright, almost electric shade that separated Performance Center models from quieter catalogue trims. Other paints existed, yet blue remains the colour enthusiasts still associate with the badge.",
+          "Exterior kits usually meant deeper front spoilers, side skirts, rear diffusers, and larger alloy wheels. Interiors leaned on Recaro buckets, Alcantara textures, yellow stitching accents, and OPC-branded controls. The logo itself - bold yellow OPC letters with a black-and-white checkered motif - announced motorsport ambition without needing a press release.",
+          "Marketing framed the division as accessible performance: cars priced to compete with Ford ST and Volkswagen GTI rivals rather than exclusive AMG-style exotica. Inside this museum's timeline that philosophy is the heart of OPC - serious enough for a track day, usable enough for Monday morning.",
+        ],
+        image: "media/world/opc/logo.png",
       },
       {
         id: "gtc-concept",
@@ -702,49 +729,91 @@
         category: "opc",
         date: "1999",
         title: "Astra G OPC",
-        excerpt: "The early OPC hatch that made performance feel reachable.",
+        excerpt: "The first OPC production car - and the one that sold out fast.",
         body: [
-          "Astra G OPC helped define what a modern Opel hot hatch could be: turbo thrust, focused hardware, and styling that signalled intent without abandoning everyday usability.",
-          "For many drivers it was the first OPC they could imagine owning - sporting enough to feel special, familiar enough to live with. That balance is part of why the model still resonates in enthusiast memory.",
-          "In this collection, Astra G OPC sits at the hinge between 1990s GSi culture and the sharper OPC identity of the 2000s.",
+          "Astra G OPC was the opening chapter of the OPC catalogue. Launched in 1999, the first version used a naturally aspirated 2.0-litre ECOTEC producing 160 PS, with revised suspension, steering, brakes, and bodywork that made the hatch unmistakably Performance Center. Planned volume was about 2,400 cars; demand was stronger, and roughly 3,000 units sold out within months.",
+          "From around 2001 a turbocharged 2.0-litre OPC followed with about 200 PS, pushing top speed toward 235 km/h and sharpening the hatch's reputation. Three-door hatch and Caravan wagon bodies both carried the badge, proving OPC was a programme rather than a single silhouette.",
+          "For this museum Astra G OPC is the hinge between GSi culture and the turbo OPC decade. It is the car that made the three letters real on the road - and reachable for drivers who already lived with ordinary Astras.",
         ],
         image: "media/world/opc/cover.png",
+      },
+      {
+        id: "opc-x-treme",
+        category: "opc",
+        date: "2001",
+        title: "Astra Coupe OPC X-Treme",
+        excerpt: "A one-off DTM-inspired concept that showed OPC without limits.",
+        body: [
+          "Unveiled at the 2001 Geneva Motor Show, Astra Coupe OPC X-Treme was OPC thinking pushed to theatre. Built around race-car DNA linked to Opel's DTM programme, it wore a carbon-fibre body over a tubular spaceframe and featured dramatic gull-wing doors.",
+          "Power came from a large Northstar-family V8 - commonly quoted around 4.0 litres, 444 PS and 530 Nm - driving the rear wheels through a sequential gearbox. Claimed figures floated near 4 seconds to 100 km/h and more than 300 km/h at the top end. Production was considered, then abandoned when the projected price climbed into six-figure territory.",
+          "As a museum object the X-Treme matters because it reveals OPC ambition beyond catalogue hot hatches. Even when a car stayed unique, it told customers what the Performance Center dreamed about after office hours.",
+        ],
+        image: "media/world/opc/x-treme.png",
       },
       {
         id: "zafira-opc",
         category: "opc",
         date: "2001",
         title: "Zafira OPC",
-        excerpt: "The unlikely hot MPV with serious turbo character.",
+        excerpt: "The world's fastest production compact MPV - with seven seats.",
         body: [
-          "A performance MPV sounds like a joke until you meet Zafira OPC. Opel took the flexible Flex7 family machine and gave it turbo power and chassis seriousness that made the whole idea strangely convincing.",
-          "It remains one of OPC's most memorable experiments: proof that Performance Center thinking was not limited to hatches and saloons. Even people-carriers could be dramatic.",
-          "As a museum story, Zafira OPC is valuable precisely because it is unexpected - a reminder that Opel's sporting department enjoyed bending categories.",
+          "Zafira A OPC (2001) was OPC's most mischievous idea: take Flex7 family packaging and fit a 2.0-litre turbo with about 192 PS. Acceleration to 100 km/h in roughly 8.2 seconds and a 220 km/h top speed made it, at launch, the quickest production compact MPV of its kind.",
+          "Chassis and brake upgrades kept the joke from becoming dangerous. Recaro seats and the familiar OPC visual code completed the transformation. Zafira B OPC later raised output to around 240 PS; in 2006 a Zafira OPC set a Nordschleife compact-van class time of 8:54.38 - a record that stood for years and still defines how seriously Opel took the model.",
+          "Inside this collection Zafira OPC is the proof that Performance Center thinking refused to stay inside hatchback orthodoxy. Family cars could be dramatic too.",
         ],
+        image: "media/world/opc/zafira-opc.jpg",
+      },
+      {
+        id: "astra-h-opc",
+        category: "opc",
+        date: "2005",
+        title: "Astra H OPC",
+        excerpt: "240 PS, GTC drama, and Nordschleife credibility.",
+        body: [
+          "Astra H OPC arrived in 2005 on the three-door GTC body with a 2.0-litre turbo tuned to around 240 PS and strong mid-range torque. Zero to 100 km/h came in roughly 6.3 seconds - a clear step beyond the first-generation Astra OPC story.",
+          "Development leaned hard on Nürburgring work. In 2005 Manuel Reuter recorded a compact-class Nordschleife lap of about 8:35.9, a result Opel later celebrated with a limited Nürburgring Edition. The car's reputation mixed praise for chassis balance with the familiar hot-hatch debate about torque steer under full power.",
+          "For the museum Astra H OPC is the mid-decade OPC hatch: still usable, now much more forceful, and firmly tied to Opel's circuit-testing culture.",
+        ],
+        image: "media/world/opc/astra-h-opc.jpg",
       },
       {
         id: "vectra-c-opc",
         category: "opc",
         date: "2005",
         title: "Vectra C OPC",
-        excerpt: "A fast executive with OPC attitude before 2007.",
+        excerpt: "A midsize OPC with twin-turbo V6 authority.",
         body: [
-          "Vectra C OPC stretched the OPC idea into larger executive metal. High power, firm purpose, and a more serious silhouette showed that Opel Performance Center was not only a hot-hatch label.",
-          "It belongs to the final years inside this museum's boundary: an assertive, late-period statement that everyday Opel platforms could still host serious performance engineering.",
-          "Collectors often remember it as the grown-up OPC - less playful than Astra, more intentional as a long-distance machine with teeth.",
+          "Vectra C OPC (from 2005) moved the badge into executive territory. Available as GTS hatch and Caravan wagon, it used a 2.8-litre V6 turbo - often described as twin-turbo in period coverage - producing around 280 PS and serious torque for long-distance pace.",
+          "Hardware matched the brief: adaptive dampers, serious brakes, and a calmer, heavier presence than Astra OPC. Acceleration to 100 km/h in roughly 6.3 seconds put the Vectra among Opel's quickest road cars of the era inside this museum's year limit.",
+          "Collectors often call it the grown-up OPC - less playful than a hot hatch, more intentional as a fast touring machine with Performance Center attitude.",
         ],
+        image: "media/world/opc/vectra-c-opc.jpg",
+      },
+      {
+        id: "meriva-opc",
+        category: "opc",
+        date: "2006",
+        title: "Meriva OPC",
+        excerpt: "A compact MPV with unexpected turbo heat.",
+        body: [
+          "Meriva A OPC (from 2006) extended the Performance Center experiment into Opel's small MPV. A 2.0-litre turbo with about 240 PS and chassis upgrades turned a practical urban people-mover into another sleeper - less famous than Zafira OPC, but part of the same refusal to leave any body style untouched.",
+          "Like other OPC models of the mid-2000s it combined Recaro seating, body kit aggression, and turbo thrust with everyday packaging. The result was never the purest driver's car in the lineup, yet it broadened what the badge could mean.",
+          "In museum terms Meriva OPC is a footnote with teeth: proof that by 2006 OPC had become a system applied across Opel's European catalogue, not only a hatchback club.",
+        ],
+        image: "media/world/opc/meriva-opc.jpg",
       },
       {
         id: "corsa-opc-era",
         category: "opc",
         date: "2007",
-        title: "Corsa OPC arrives",
-        excerpt: "Supermini aggression at the edge of this museum's timeline.",
+        title: "Corsa D OPC",
+        excerpt: "Supermini OPC at the edge of this museum's timeline.",
         body: [
-          "By 2007 the Corsa OPC brought OPC energy firmly into the supermini class - compact, loud in character, and aimed at drivers who wanted the badge at a smaller scale.",
-          "Sitting on the edge of this collection's year limit, it marks how completely OPC had become a brand language across Opel's range: from Astra to Zafira to Corsa.",
-          "In museum terms it is a closing note of the pre-2008 chapter: Opel still speaking performance fluently at every size.",
+          "Corsa D OPC arrived in 2007 with a 1.6-litre turbo producing about 192 PS - compact, sharp, and aimed at drivers who wanted the OPC badge at supermini scale. Lowered suspension, serious brakes, and Recaro seats completed a pocket-rocket formula validated through Nordschleife testing.",
+          "The timing is perfect for this collection: Corsa OPC sits on the museum's 2007 boundary, marking how completely Performance Center language had spread from Astra and Zafira down to Opel's smallest mainstream hatch.",
+          "GSi did not vanish overnight - a milder Corsa GSi later filled the gap beneath OPC power - but the hierarchy was now clear. OPC was the top of Opel's performance mountain. Pure Passion, at last, came in every size.",
         ],
+        image: "media/world/opc/corsa-opc.png",
       },
       {
         id: "manta-400",
@@ -1010,9 +1079,14 @@
         text: "A softer supermini generation spreads widely as Opel prepares sportier small-car ideas.",
       },
       {
+        year: "1997",
+        title: "Opel Performance Center",
+        text: "OPC GmbH is founded in Rüsselsheim under Volker Strycek to develop factory high-performance road cars.",
+      },
+      {
         year: "1999",
-        title: "OPC gathers pace",
-        text: "Opel Performance Center identity hardens around sharper Astras and a clearer sporting badge.",
+        title: "Astra G OPC",
+        text: "The first OPC production model sells out fast and establishes Arden Blue, Recaro, and Pure Passion as a language.",
       },
       {
         year: "2000",
@@ -1021,8 +1095,8 @@
       },
       {
         year: "2001",
-        title: "Zafira A era",
-        text: "Flexible seven-seat packaging becomes a defining Opel family idea - including unlikely OPC heat.",
+        title: "Zafira OPC and X-Treme",
+        text: "A turbo MPV rewrites family-car expectations while Astra Coupe OPC X-Treme shows the division without limits.",
       },
       {
         year: "2004",
@@ -1030,9 +1104,14 @@
         text: "A new Astra generation continues compact Opel life toward the mid-2000s.",
       },
       {
+        year: "2005",
+        title: "OPC across the range",
+        text: "Astra H OPC, Vectra C OPC, and Zafira B OPC spread Performance Center power from hot hatch to executive metal.",
+      },
+      {
         year: "2007",
-        title: "Collection boundary",
-        text: "This museum focuses on Opel automobiles and stories up to 2007.",
+        title: "Corsa OPC & boundary",
+        text: "Corsa D OPC brings the badge to supermini scale as this museum's timeline closes at 2007.",
       },
     ],
     history: {
@@ -1074,9 +1153,9 @@
         {
           heading: "Competition & OPC",
           paragraphs: [
-            "Motorsport gave Opel a louder public voice: Ascona 400 and Manta 400 on rally stages, Calibra and Astra theatre in touring cars, posters that outlived race weekends.",
-            "Later, OPC concentrated road-car performance into a badge customers could trust. Astra OPC, unlikely machines like Zafira OPC, and sharper Vectras extended the idea that Opel could be intense on purpose.",
-            "Together, rally legends and OPC road cars explain why enthusiasts still argue about Opel with affection rather than only nostalgia.",
+            "Motorsport gave Opel a louder public voice: Ascona 400 and Manta 400 on rally stages, Calibra and Astra theatre in touring cars, posters that outlived race weekends. Through the 1980s and 1990s GSi badges already sold sportier Mantas, Kadetts, Astras, and Corsas - but without one dedicated workshop.",
+            "In 1997 Opel Performance Center GmbH concentrated that ambition in Rüsselsheim under Volker Strycek. Astra G OPC opened the catalogue in 1999; Zafira OPC, Vectra C OPC, Astra H OPC, Meriva OPC, and Corsa D OPC followed, proving the three letters could live on hatches, MPVs, and executive metal alike.",
+            "Together, rally legends and OPC road cars explain why enthusiasts still argue about Opel with affection rather than only nostalgia - Pure Passion was never only a slogan.",
           ],
         },
         {
@@ -1102,6 +1181,128 @@
     },
     gallery: [],
   };
+
+  if (window.OPC_ARTICLE_PATCHES) {
+    Object.keys(window.OPC_ARTICLE_PATCHES).forEach(function (id) {
+      var article = window.OPEL.articles.find(function (a) {
+        return a.id === id;
+      });
+      if (article) {
+        Object.assign(article, window.OPC_ARTICLE_PATCHES[id]);
+      }
+    });
+  }
+
+  if (window.SITE_CONTENT_PATCHES) {
+    var sitePatch = window.SITE_CONTENT_PATCHES;
+    if (sitePatch.history) {
+      Object.assign(window.OPEL.history, sitePatch.history);
+    }
+    if (sitePatch.about) {
+      Object.assign(window.OPEL.about, sitePatch.about);
+    }
+    if (sitePatch.timeline) {
+      window.OPEL.timeline = sitePatch.timeline;
+    }
+    if (sitePatch.articles) {
+      Object.keys(sitePatch.articles).forEach(function (id) {
+        var article = window.OPEL.articles.find(function (a) {
+          return a.id === id;
+        });
+        if (article) {
+          Object.assign(article, sitePatch.articles[id]);
+        }
+      });
+    }
+  }
+
+  if (window.CONCEPTS_ARTICLE_PATCHES) {
+    Object.keys(window.CONCEPTS_ARTICLE_PATCHES).forEach(function (id) {
+      var conceptArticle = window.OPEL.articles.find(function (a) {
+        return a.id === id;
+      });
+      if (conceptArticle) {
+        Object.assign(conceptArticle, window.CONCEPTS_ARTICLE_PATCHES[id]);
+      }
+    });
+  }
+
+  if (window.SITE_CONTENT_IMAGES) {
+    var siteImages = window.SITE_CONTENT_IMAGES;
+
+    if (siteImages.history && window.OPEL.history) {
+      if (siteImages.history.heroImage) {
+        window.OPEL.history.heroImage = siteImages.history.heroImage;
+        window.OPEL.history.heroCaption = siteImages.history.heroCaption || "";
+      }
+      if (siteImages.history.sections && window.OPEL.history.sections) {
+        siteImages.history.sections.forEach(function (sectionImage, index) {
+          if (window.OPEL.history.sections[index]) {
+            Object.assign(window.OPEL.history.sections[index], sectionImage);
+          }
+        });
+      }
+    }
+
+    if (siteImages.about && window.OPEL.about) {
+      if (siteImages.about.heroImage) {
+        window.OPEL.about.heroImage = siteImages.about.heroImage;
+        window.OPEL.about.heroCaption = siteImages.about.heroCaption || "";
+      }
+      if (siteImages.about.sections && window.OPEL.about.sections) {
+        siteImages.about.sections.forEach(function (sectionImage, index) {
+          if (window.OPEL.about.sections[index]) {
+            Object.assign(window.OPEL.about.sections[index], sectionImage);
+          }
+        });
+      }
+    }
+
+    if (siteImages.timeline && window.OPEL.timeline) {
+      window.OPEL.timeline.forEach(function (item) {
+        var timelineImage = siteImages.timeline[item.year];
+        if (timelineImage) {
+          Object.assign(item, timelineImage);
+        }
+      });
+    }
+
+    if (siteImages.articles) {
+      Object.keys(siteImages.articles).forEach(function (id) {
+        var article = window.OPEL.articles.find(function (a) {
+          return a.id === id;
+        });
+        if (article) {
+          Object.assign(article, siteImages.articles[id]);
+        }
+      });
+    }
+  }
+
+  if (window.CAR_CONTENT_PATCHES) {
+    Object.keys(window.CAR_CONTENT_PATCHES).forEach(function (id) {
+      var carItem = window.OPEL.cars.find(function (c) {
+        return c.id === id;
+      });
+      if (!carItem) return;
+      var patch = window.CAR_CONTENT_PATCHES[id];
+      Object.assign(carItem, patch);
+      if (patch.engines) {
+        carItem.engines = patch.engines.map(function (e, i) {
+          return {
+            id: carItem.id + "-eng-" + i,
+            name: e.name,
+            meta: e.meta,
+            description: e.description || "",
+            sound: e.sound || "media/sounds/placeholder.mp3",
+          };
+        });
+      }
+      if (patch.sections && patch.sections.length) {
+        carItem.history = patch.sections[0].body[0];
+      }
+    });
+  }
 
   function pushGalleryItem(list, entry) {
     if (!entry || !entry.image) return;
@@ -1140,6 +1341,12 @@
     pushGalleryItem(galleryItems, {
       caption: a.title,
       image: a.image,
+    });
+    (a.gallery || []).forEach(function (item) {
+      pushGalleryItem(galleryItems, {
+        caption: item.caption || a.title,
+        image: item.image,
+      });
     });
   });
 
